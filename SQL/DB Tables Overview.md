@@ -53,6 +53,153 @@ The **Flights** table stores information about individual flights, including det
 ### Description:
 - **FlightID** is a computed column that combines various fields to create a unique identifier for the flight.
 
+### Sample Data:
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>YEAR</th>
+        <th>MONTH</th>
+        <th>DAY</th>
+        <th>DAY_OF_WEEK</th>
+        <th>AIRLINE</th>
+        <th>FLIGHT_NUMBER</th>
+        <th>TAIL_NUMBER</th>
+        <th>ORIGIN_AIRPORT</th>
+        <th>DESTINATION_AIRPORT</th>
+        <th>SCHEDULED_DEPARTURE</th>
+        <th>DEPARTURE_TIME</th>
+        <th>DEPARTURE_DELAY</th>
+        <th>TAXI_OUT</th>
+        <th>WHEELS_OFF</th>
+        <th>SCHEDULED_TIME</th>
+        <th>ELAPSED_TIME</th>
+        <th>AIR_TIME</th>
+        <th>DISTANCE</th>
+        <th>WHEELS_ON</th>
+        <th>TAXI_IN</th>
+        <th>SCHEDULED_ARRIVAL</th>
+        <th>ARRIVAL_TIME</th>
+        <th>ARRIVAL_DELAY</th>
+        <th>DIVERTED</th>
+        <th>CANCELLED</th>
+        <th>CANCELLATION_REASON</th>
+        <th>AIR_SYSTEM_DELAY</th>
+        <th>SECURITY_DELAY</th>
+        <th>AIRLINE_DELAY</th>
+        <th>LATE_AIRCRAFT_DELAY</th>
+        <th>WEATHER_DELAY</th>
+        <th>FlightID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2015</td>
+        <td>2</td>
+        <td>18</td>
+        <td>3</td>
+        <td>AA</td>
+        <td>6</td>
+        <td>N365AA</td>
+        <td>OGG</td>
+        <td>DFW</td>
+        <td>1815</td>
+        <td>1809</td>
+        <td>-6</td>
+        <td>8</td>
+        <td>1817</td>
+        <td>424</td>
+        <td>410</td>
+        <td>399</td>
+        <td>3711</td>
+        <td>456</td>
+        <td>3</td>
+        <td>519</td>
+        <td>459</td>
+        <td>-20</td>
+        <td>0</td>
+        <td>0</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>20150218AA0006OGGDFW</td>
+      </tr>
+      <tr>
+        <td>2015</td>
+        <td>2</td>
+        <td>18</td>
+        <td>3</td>
+        <td>AA</td>
+        <td>8</td>
+        <td>N357AA</td>
+        <td>HNL</td>
+        <td>DFW</td>
+        <td>1745</td>
+        <td>1738</td>
+        <td>-7</td>
+        <td>11</td>
+        <td>1749</td>
+        <td>441</td>
+        <td>428</td>
+        <td>410</td>
+        <td>3784</td>
+        <td>439</td>
+        <td>7</td>
+        <td>506</td>
+        <td>446</td>
+        <td>-20</td>
+        <td>0</td>
+        <td>0</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>20150218AA0008HNLDFW</td>
+      </tr>
+      <tr>
+        <td>2015</td>
+        <td>2</td>
+        <td>18</td>
+        <td>3</td>
+        <td>AA</td>
+        <td>10</td>
+        <td>N795AA</td>
+        <td>LAX</td>
+        <td>JFK</td>
+        <td>2200</td>
+        <td>2155</td>
+        <td>-5</td>
+        <td>17</td>
+        <td>2212</td>
+        <td>317</td>
+        <td>309</td>
+        <td>287</td>
+        <td>2475</td>
+        <td>559</td>
+        <td>5</td>
+        <td>617</td>
+        <td>604</td>
+        <td>-13</td>
+        <td>0</td>
+        <td>0</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>NULL</td>
+        <td>20150218AA0010LAXJFK</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
 ---
 
 ## 2. **Airlines Table**
@@ -67,6 +214,32 @@ The **Airlines** table stores information about airlines using IATA codes and th
 
 ### Constraints:
 - **PK_Airlines**: Primary key on **IATA_CODE**.
+
+### Sample Data:
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>IATA_CODE</th>
+        <th>AIRLINE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AA</td>
+        <td>American Airlines Inc.</td>
+      </tr>
+      <tr>
+        <td>AS</td>
+        <td>Alaska Airlines Inc.</td>
+      </tr>
+      <tr>
+        <td>B6</td>
+        <td>JetBlue Airways</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 ---
 
@@ -88,6 +261,53 @@ The **Airports** table stores details about airports, including their IATA code,
 ### Constraints:
 - **PK_Airports**: Primary key on **IATA_CODE**.
 
+
+### Sample Data:
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>IATA_CODE</th>
+        <th>AIRPORT</th>
+        <th>CITY</th>
+        <th>STATE</th>
+        <th>COUNTRY</th>
+        <th>LATITUDE</th>
+        <th>LONGITUDE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ABE</td>
+        <td>Lehigh Valley International Airport</td>
+        <td>Allentown</td>
+        <td>PA</td>
+        <td>USA</td>
+        <td>40.652359</td>
+        <td>-75.440399</td>
+      </tr>
+      <tr>
+        <td>ABI</td>
+        <td>Abilene Regional Airport</td>
+        <td>Abilene</td>
+        <td>TX</td>
+        <td>USA</td>
+        <td>32.411320</td>
+        <td>-99.681900</td>
+      </tr>
+      <tr>
+        <td>ABQ</td>
+        <td>Albuquerque International Sunport</td>
+        <td>Albuquerque</td>
+        <td>NM</td>
+        <td>USA</td>
+        <td>35.040218</td>
+        <td>-106.609192</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 ---
 
 ## Relationships:
@@ -95,3 +315,5 @@ The **Airports** table stores details about airports, including their IATA code,
 - The **Flights** table also references the **Airports** table twice:
   - **ORIGIN_AIRPORT** references the airport of origin.
   - **DESTINATION_AIRPORT** references the airport of destination.
+
+![ER Diagram](data/tables_gen_no_data/ER%20diagram.png)
