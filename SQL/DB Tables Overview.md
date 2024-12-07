@@ -11,18 +11,18 @@ The **Flights** table stores information about individual flights, including det
 ### Columns:
 | Column Name              | Data Type     | Description                                                    |
 |--------------------------|---------------|----------------------------------------------------------------|
-| **YEAR**                 | smallint      | The year the flight is scheduled.                              |
-| **MONTH**                | tinyint       | The month the flight is scheduled.                             |
-| **DAY**                  | tinyint       | The day of the month the flight is scheduled.                  |
-| **DAY_OF_WEEK**          | tinyint       | The day of the week the flight is scheduled.                   |
+| **YEAR**                 | smallint      | The year the flight is scheduled.  (1903-32767)                |
+| **MONTH**                | tinyint       | The month the flight is scheduled. (1-12)                      |
+| **DAY**                  | tinyint       | The day of the month the flight is scheduled. (1-31)           |
+| **DAY_OF_WEEK**          | tinyint       | The day of the week the flight is scheduled. (1-7)             |
 | **AIRLINE**              | nvarchar(2)   | The airline's IATA code.                                       |
 | **FLIGHT_NUMBER**        | smallint      | The flight number.                                             |
 | **TAIL_NUMBER**          | nvarchar(20)  | The aircraft's tail number (nullable).                         |
 | **ORIGIN_AIRPORT**       | nvarchar(3)   | The IATA code of the origin airport.                           |
 | **DESTINATION_AIRPORT**  | nvarchar(3)   | The IATA code of the destination airport.                      |
 | **SCHEDULED_DEPARTURE**  | smallint      | The scheduled departure time (in minutes).                     |
-| **DEPARTURE_TIME**       | smallint      | The actual departure time (nullable).                          |
-| **DEPARTURE_DELAY**      | int           | The delay in departure (nullable).                             |
+| **DEPARTURE_TIME**       | smallint      | The actual departure time (nullable). [0000-2359]              |
+| **DEPARTURE_DELAY**      | int           | The delay in departure (nullable). [+/-]                       |
 | **TAXI_OUT**             | smallint      | The taxi-out time (nullable).                                  |
 | **WHEELS_OFF**           | smallint      | The time when the plane takes off (nullable).                  |
 | **SCHEDULED_TIME**       | smallint      | The scheduled flight duration (in minutes).                    |
@@ -31,7 +31,7 @@ The **Flights** table stores information about individual flights, including det
 | **DISTANCE**             | smallint      | The distance of the flight (in miles).                         |
 | **WHEELS_ON**            | smallint      | The time when the plane lands (nullable).                      |
 | **TAXI_IN**              | smallint      | The taxi-in time (nullable).                                   |
-| **SCHEDULED_ARRIVAL**   | smallint      | The scheduled arrival time (in minutes).                       |
+| **SCHEDULED_ARRIVAL**   | smallint      | The scheduled arrival time (in minutes).                        |
 | **ARRIVAL_TIME**         | smallint      | The actual arrival time (nullable).                            |
 | **ARRIVAL_DELAY**        | int           | The delay in arrival (nullable).                               |
 | **DIVERTED**             | int           | Whether the flight was diverted (0 or 1).                      |
