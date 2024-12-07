@@ -316,4 +316,4 @@ The **Airports** table stores details about airports, including their IATA code,
   - **ORIGIN_AIRPORT** references the airport of origin.
   - **DESTINATION_AIRPORT** references the airport of destination.
 
-![ER Diagram](data/tables_gen_no_data/ER%20diagram.png)
+![ER Diagram](https://raw.githubusercontent.com/ricmunz/DE-Python-SQL-Tests/refs/heads/main/SQL/data/tables_gen_no_data/ER%20Diagram.png)
