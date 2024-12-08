@@ -84,6 +84,24 @@ def fetch_data_and_load_to_dataframe(endpoint_url, column_dtypes=None):
         return None
 
 
+# Function to separate invalid data (rows with null values on ANY column) onto another DataFrame
+def remove_and_separate_invalid_data(df):
+    """
+    This function removes rows with any null values from a DataFrame
+    and stores them in a separate DataFrame called 'invalid_data'.
+    
+    :param df: The DataFrame to check and clean.
+    :return: invalid_data_df, which contains rows with null values.
+    """
+    # Identify rows with null values in any column
+    invalid_data = df[df.isnull().any(axis=1)]
+    
+    # Remove rows with null values from the original DataFrame
+    df.dropna(inplace=True)
+
+    return invalid_data
+
+
 # Function to display DataFrame information and first few rows
 def display_dataframe_info(df):
     """
@@ -98,6 +116,24 @@ def display_dataframe_info(df):
         print(df.head())
 
 
+# Simple function to print bold string to console.
+def print_bold(text: str):
+    """
+    Prints the given text in bold in the console.
+
+    Args:
+        text (str): The string to be printed in bold.
+
+    """
+    # ANSI escape code for bold text
+    BOLD_CODE = '\033[1m'
+    ORANGE_CODE = '\033[38;5;214m'
+    RESET_CODE = '\033[0m'
+    
+    # Print the bold text
+    print(f"\n\n{BOLD_CODE}{ORANGE_CODE}{text}{RESET_CODE}")
+
+
 def main():
 
     # API endpoint URL defined at the top of file, under imports.
@@ -105,8 +141,24 @@ def main():
     # Fetch data from API and load into DataFrame (no optional dtypes specified)
     application_in = fetch_data_and_load_to_dataframe(API_URL)
 
-    # Display DataFrame information
+    # Display original DataFrame information
+    print_bold("application_in (Original)")
     display_dataframe_info(application_in)
+    
+    # Remove and separate all rows from application_in with null values on ANY column onto a new DataFrame 
+    invalid_data = remove_and_separate_invalid_data(application_in)
+    
+    # Display the separate invalid_data DataFrame
+    print_bold("invalid_data")
+    display_dataframe_info(invalid_data)
+    
+    # Display modified Dataframe information
+    print_bold("application_in (Post null value cleanup)")
+    display_dataframe_info(application_in)
+    
+    
+    
+    
 
 if __name__ == '__main__':
     # Run the main function
@@ -117,7 +169,7 @@ if __name__ == '__main__':
 
 # [x]• You will ingest the raw data into a structure (data type of your choosing) called “application_in”.
 
-# []• Remove all rows from application_in that contain null values in ANY column and place them in a data structure (data type of your choosing) named “invalid_data”.
+# [x]• Remove all rows from application_in that contain null values in ANY column and place them in a data structure (data type of your choosing) named “invalid_data”.
 
 # []• Convert all state senate district (senate) entries in application_in to snake case.
 
