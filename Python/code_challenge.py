@@ -37,6 +37,7 @@ import pandas as pd
 from re import sub
 
 API_URL = "https://data.pa.gov/resource/mcba-yywm.json"
+ELECTION_DATE = "2020-11-03"
 
 # Function to fetch data from API into DataFrame with optional specified data types
 def fetch_data_and_load_to_dataframe(endpoint_url, column_dtypes=None):
@@ -73,7 +74,7 @@ def fetch_data_and_load_to_dataframe(endpoint_url, column_dtypes=None):
         # Convert the Floating Timestamp columns to datetime
         for col in floating_timestamp_columns:
             if col in df.columns:
-                df[col] = pd.to_datetime(df[col])
+                df[col] = pd.to_datetime(df[col], errors='coerce')
         
         # Add confidentiality flag for birth dates set to 1/1/1800 (per dataset documentation)
         # to allow for exclusion from later correlation analysis
@@ -181,24 +182,78 @@ def convert_column_to_snake_case(df, column_name):
 def add_column_year_of_birth(df):
     """
     Adds a 'yr_born' column with the year extracted from 'dateofbirth'.
-    Modifies DataFrame in place.
+    DataFrame cannot be modified in place by reference. Must be updated
+    in main with reasignment. `application_in = add_column_year_of_birth(application_in)`
 
     :param df: DataFrame with an existing 'dateofbirth' column.
-    :type df: pandas.DataFrame
     """
     if 'dateofbirth' in df.columns:
-        # Extract year from 'dateofbirth' and add 'yr_born' column
+        # Extract the year from the 'dateofbirth' column
         df['yr_born'] = pd.to_datetime(df['dateofbirth']).dt.year
+        
+        # Reorder columns to place 'yr_born' immediately after 'dateofbirth'
+        cols = df.columns.tolist()
+        dateofbirth_idx = cols.index('dateofbirth')
+        cols.insert(dateofbirth_idx + 1, cols.pop(cols.index('yr_born')))
+        df = df[cols]
+        
+        # Ensure 'yr_born' is of type integer
         df['yr_born'] = df['yr_born'].astype(int)
-        
-        # Reposition 'yr_born' next to 'dateofbirth'
-        columns = df.columns.tolist()
-        dateofbirth_index = columns.index('dateofbirth')
-        columns.insert(dateofbirth_index + 1, columns.pop(columns.index('yr_born')))
-        
-        # Reorganize columns in place
-        df.columns = columns
+        return df
+    
+    
+def corr_age_and_party(df, exclude_confidential=True, use_drother_mapping=True):
+    """
+    Calculates the correlation between age and party affiliation.
+    Party affiliation can either be mapped to 'R', 'D', and 'Other' or to every unique party,
+    based on the value of `use_drother_mapping`.
+    
+    By default, excludes entries flagged as confidential.
+    This can be controlled with the `exclude_confidential` parameter.
 
+    :param df: DataFrame with columns 'dateofbirth', 'party', and 'is_confidential'.
+    :param exclude_confidential: Whether to exclude confidential entries. Default is True.
+    :param use_drother_mapping: If True, map parties to 'R', 'D', and 'Other'. If False, map each unique party to an integer.
+    :return: Correlation matrix for age and party affiliation.
+    :rtype: pandas.DataFrame
+    :raises KeyError: If any required columns are missing.
+    """
+    
+    # Ensure required columns exist
+    if 'party' not in df or 'dateofbirth' not in df or 'is_confidential' not in df:
+        raise KeyError("The DataFrame must contain 'party', 'dateofbirth', and 'is_confidential' columns.")
+    
+    # Exclude confidential entries if specified
+    if exclude_confidential:
+        df = df[df['is_confidential'] == False]
+    
+    # Encode the party column
+    # If DROther mapping is requested (use_drother_mapping=True)
+    if use_drother_mapping:
+        def map_party(party):
+            if party in ['Republican', 'R']:
+                return 'R'
+            elif party in ['Democrat', 'D']:
+                return 'D'
+            else:
+                return 'Other'
+        
+        df['party_mapped'] = df['party'].apply(map_party)
+        party_map = {'R': 0, 'D': 1, 'Other': 2}  # Mapping for R, D, Other
+        df['party_encoded'] = df['party_mapped'].map(party_map)
+    
+    # If unique party encoding is requested (use_drother_mapping=False)
+    else:
+        party_map = {party: idx for idx, party in enumerate(df['party'].unique())}
+        df['party_encoded'] = df['party'].map(party_map)
+    
+    # Calculate applicant's age on the date of the election.
+    df['age'] = (pd.to_datetime(ELECTION_DATE) - df['dateofbirth']).dt.days // 365
+    
+    # Calculate correlation matrix for age and party_encoded
+    correlation_matrix = df[['age', 'party_encoded']].corr()
+    
+    return correlation_matrix
 
 
 def main():
@@ -230,15 +285,16 @@ def main():
     
     # Create 'yr_born'(int) column right next to 'dateofbirth'
     print_bold("application_in \t(Added 'yr_born' column)")
-    display_dataframe_info(application_in)
-    
+    application_in = add_column_year_of_birth(application_in) # Update/Reorder cannot be in-place by reference
     print_df_head(application_in)
-    add_column_year_of_birth(application_in)
-    print_df_head(application_in)    
     
-    unique_values_count =  application_in['party'].nunique()
-    print_bold("unique values:")
-    print(unique_values_count)
+    # Analyze applicant age and party excluding confidential ages (Excluding confidential yr_born)
+    print_bold("Correlation matrix: Age and Party (All parties)")
+    print(corr_age_and_party(application_in, use_drother_mapping=False))
+    
+    print_bold("Correlation matrix: Age and Party (Dem,Rep,Other)")
+    print(corr_age_and_party(application_in))
+    
     
 
 if __name__ == '__main__':
@@ -256,7 +312,7 @@ if __name__ == '__main__':
 
 # [x]• Create a new field in application_in, “yr_born”, that contains each voter’s year of birth (dateofbirth). The data type should be an integer. The yr_born field should appear immediately right of “dateofbirth”.
 
-# []• How does applicant age (in years) and party designation (party) relate to overall vote by mail requests?
+# [x]• How does applicant age (in years) and party designation (party) relate to overall vote by mail requests?
 
 # []• What was the median latency from when each legislative district (legislative) issued their application and when the ballot was returned?
 
