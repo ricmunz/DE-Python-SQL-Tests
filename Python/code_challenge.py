@@ -314,6 +314,39 @@ def get_most_ballot_count_in_group(df, column_name):
     
     return max_count_df
 
+# Returns a DataFrame of grouped districts with their median latency in days between app issued and ballot
+def calculate_median_latency(df, column_name='legislative'):
+    """
+    Calculate the median latency in days between application issued and ballot return for district in a group.
+
+    Parameters:
+        df (pandas.DataFrame): DataFrame with application and ballot data.
+        column_name (str): The column to group by (default is 'legislative').
+
+    Raises:
+        ValueError: If the specified column_name is not in the DataFrame.
+
+    Returns:
+        pandas.DataFrame: A DataFrame with the specified column group and the median latency in days.
+    """
+    # Check if the column_name exists in the DataFrame
+    if column_name not in df.columns:
+        raise ValueError(f"'{column_name}' is not a valid column name in the DataFrame.")
+    
+    # Filter out rows where the ballot has not been returned
+    df = df.dropna(subset=['ballotreturneddate'])
+
+    # Calculate the latency in days
+    df['latency'] = (df['ballotreturneddate'] - df['appissuedate']).dt.days
+    
+    # Group by the specified column and calculate the median latency
+    result = df.groupby(column_name)['latency'].median().reset_index()
+    
+    # Rename columns for clarity
+    result.columns = [column_name, 'median_latency_days']
+    
+    return result
+
 
 def main():
 
@@ -354,10 +387,13 @@ def main():
     print_bold("Correlation matrix: Age and Party (Dem,Rep,Other)")
     print(corr_age_and_party(application_in))
     
+    # Calculate the median latency in days between application issue and ballot return (per legislative district)
+    print_bold("Median day latency per district between app issue and ballot return (legislative)")
+    print_df_head(calculate_median_latency(application_in, 'legislative'))
+    
     # Get the congressional district with most ballot requests
     print_bold("Congressional district with most ballot requests")
     print(get_most_ballot_count_in_group(application_in, 'congressional'))
-    
     
 
 if __name__ == '__main__':
@@ -377,7 +413,7 @@ if __name__ == '__main__':
 
 # [x]• How does applicant age (in years) and party designation (party) relate to overall vote by mail requests?
 
-# []• What was the median latency from when each legislative district (legislative) issued their application and when the ballot was returned?
+# [x]• What was the median latency from when each legislative district (legislative) issued their application and when the ballot was returned?
 
 # [x]• What is the congressional district (congressional) that has the highest frequency of ballot requests?
 
