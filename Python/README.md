@@ -233,4 +233,4 @@ First 5 rows:
 
 ```
 
-![plot image](/Python/plot_image.png) Likely need to use the url from repo for proper embed
+![plot image](/Python/plot_image.png)
