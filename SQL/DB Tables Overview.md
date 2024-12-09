@@ -1,3 +1,11 @@
+# SQL Code Challenge
+
+### Responses from Word instructions file are in **sql_code_challende.sql** alongside code.
+
+<br>
+<br>
+
+
 # Database Tables Overview
 
 This database contains three tables: **Flights**, **Airlines**, and **Airports**. Each table serves a specific purpose in tracking and storing information related to flights, airlines, and airports.
