@@ -255,6 +255,33 @@ def corr_age_and_party(df, exclude_confidential=True, use_drother_mapping=True):
     
     return correlation_matrix
 
+def get_most_ballot_count_in_group(df, column_name):
+    """
+    Groups the DataFrame by a specified column and returns the group with the highest ballot count.
+
+    :param df: pandas DataFrame
+        The DataFrame to group and count.
+    
+    :param column_name: str
+        The column to group by.
+
+    :raises KeyError: If the column_name is not in the DataFrame.
+
+    :return: pandas DataFrame
+        A DataFrame with one row: the group with the highest count and its count.
+    """
+    
+    if column_name not in df:
+        raise KeyError(f"The DataFrame must contain {column_name} column.")
+    
+    # Groupby and store counts
+    count_df = df.groupby([column_name])[column_name].count().reset_index(name='count')
+
+    # Get entry with highest count
+    max_count_df = count_df.nlargest(1, 'count')
+    
+    return max_count_df
+
 
 def main():
 
@@ -294,6 +321,10 @@ def main():
     
     print_bold("Correlation matrix: Age and Party (Dem,Rep,Other)")
     print(corr_age_and_party(application_in))
+    
+    # Get the congressional district with most ballot requests
+    print_bold("Congressional district with most ballot requests")
+    print(get_most_ballot_count_in_group(application_in, 'congressional'))
     
     
 
