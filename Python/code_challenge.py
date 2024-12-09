@@ -57,6 +57,7 @@ def fetch_data_and_load_to_dataframe(endpoint_url, column_dtypes=None):
     Note:
         Dataset documentation: https://data.pa.gov/Government-Efficiency-Citizen-Engagement/2020-General-Election-Mail-Ballot-Requests-Departm/mcba-yywm/about_data.
     """
+    
     try:
         # Fetching data from API
         response = requests.get(endpoint_url)
@@ -147,7 +148,7 @@ def display_dataframe_info(df):
 
 
 # Simple function to print bold string to console.
-def print_bold(text, disable_style=True):
+def print_bold(text, disable_style=False):
     """
     Prints the given text in bold orange on the console. 
     Can be disabled for cases like when saving output to plaintext.
