@@ -4,8 +4,6 @@
 
 Original CSVs were mainly imported with SSMS GUI. SQL Server exports of my data structure model without the data itself found in *SQL/data/tables_gen_no_data/*.
 
- I am much more familiar with querying or modifying existing databases. Implementing from scratch with code is something I absolutely need more practice with.
-
 <br>
 
 
@@ -14,6 +12,14 @@ Original CSVs were mainly imported with SSMS GUI. SQL Server exports of my data 
 This database contains three tables: **Flights**, **Airlines**, and **Airports**. Each table serves a specific purpose in tracking and storing information related to flights, airlines, and airports.
 
 ---
+
+## Relationships:
+- The **Flights** table references the **Airlines** table through the **AIRLINE** column, ensuring that each flight is associated with an airline.
+- The **Flights** table also references the **Airports** table twice:
+  - **ORIGIN_AIRPORT** references the airport of origin.
+  - **DESTINATION_AIRPORT** references the airport of destination.
+
+![ER Diagram](/SQL/data/tables_gen_no_data/ER_Diagram.png)
 
 ## 1. **Flights Table**
 
@@ -318,13 +324,3 @@ The **Airports** table stores details about airports, including their IATA code,
     </tbody>
   </table>
 </div>
-
----
-
-## Relationships:
-- The **Flights** table references the **Airlines** table through the **AIRLINE** column, ensuring that each flight is associated with an airline.
-- The **Flights** table also references the **Airports** table twice:
-  - **ORIGIN_AIRPORT** references the airport of origin.
-  - **DESTINATION_AIRPORT** references the airport of destination.
-
-![ER Diagram](/SQL/data/tables_gen_no_data/ER_Diagram.png)
