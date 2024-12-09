@@ -34,7 +34,7 @@ Endpoint Query Return Sample:
 """
 import requests
 import pandas as pd
-from re import sub
+import matplotlib.pyplot as plt
 
 API_URL = "https://data.pa.gov/resource/mcba-yywm.json"
 ELECTION_DATE = "2020-11-03"
@@ -116,6 +116,7 @@ def remove_and_separate_invalid_data(df):
 
     return invalid_data
 
+
 # Function to print the first 5 rows of DataFrame with a header 
 def print_df_head(df):
     """
@@ -144,22 +145,30 @@ def display_dataframe_info(df):
         print(df.info(), "\n")
         print_df_head(df)
 
+
 # Simple function to print bold string to console.
-def print_bold(text):
+def print_bold(text, disable_style=True):
     """
-    Prints the given text in bold in the console.
+    Prints the given text in bold orange on the console. 
+    Can be disabled for cases like when saving output to plaintext.
 
     Parameters:
-        text (str): The string to be printed in bold.
+        text (str): The string to be printed.
+        disable_style (bool, optional): If False (default), the text is printed with bold and orange styling.
+                                        If True, disables the use of ANSI escape codes and prints plain text.
     """
     
-    # ANSI escape code for bold text
+    # ANSI escape codes for bold and orange
     BOLD_CODE = '\033[1m'
     ORANGE_CODE = '\033[38;5;214m'
     RESET_CODE = '\033[0m'
     
-    # Print the bold text
-    print(f"\n\n{BOLD_CODE}{ORANGE_CODE}{text}{RESET_CODE}")
+    if disable_style:
+        # Print in a different format when styles are disabled
+        print(f"\n\n==== {text} ====")
+    else:
+        # Print with bold and orange styling when styles are enabled
+        print(f"\n\n{BOLD_CODE}{ORANGE_CODE}{text}{RESET_CODE}")
 
 
 # Converts a string to snake_case
@@ -198,6 +207,7 @@ def convert_column_to_snake_case(df, column_name):
 
     # Convert entries using helper function convert_str_to_snake_case()
     df[column_name] = df[column_name].apply(convert_str_to_snake_case)
+
 
 # Adds a 'yr_born' column with the year extracted from 'dateofbirth'.
 def add_column_year_of_birth(df):
@@ -314,6 +324,7 @@ def get_most_ballot_count_in_group(df, column_name):
     
     return max_count_df
 
+
 # Returns a DataFrame of grouped districts with their median latency in days between app issued and ballot
 def calculate_median_latency(df, column_name='legislative'):
     """
@@ -346,6 +357,44 @@ def calculate_median_latency(df, column_name='legislative'):
     result.columns = [column_name, 'median_latency_days']
     
     return result
+
+
+def visualize_party_applications(df):
+    """
+    Visualizes the count of Democratic and Republican applications by county with matplotlib.
+    
+    Args:
+        df (pandas.DataFrame): The DataFrame containing voter application data.
+            The DataFrame must have at least the following columns:
+            - 'countyname': The name of the county.
+            - 'party': The political party affiliation of the voter ('D' for Democratic, 'R' for Republican).
+            
+    Raises:
+        ValueError: If the DataFrame does not contain the required columns 'countyname' and 'party'.
+    """
+    
+    # Filter the data to include only Republican and Democratic applications
+    party_filtered_df = df[df['party'].isin(['D', 'R'])]
+    
+    # Group by 'countyname' and 'party' and count the number of applications in each group
+    party_counts = party_filtered_df.groupby(['countyname', 'party']).size()
+    
+    # Unstack the 'party' level of the index to create separate columns for each party
+    party_counts_unstacked = party_counts.unstack(fill_value=0)
+    
+    # Plot the data
+    party_counts_unstacked.plot(kind='bar', stacked=False, figsize=(12, 8), color=['blue', 'red'])
+    
+    # Customize the chart
+    plt.title('Democratic and Republican Application Counts by County', fontsize=16)
+    plt.xlabel('County', fontsize=12)
+    plt.ylabel('Number of Applications', fontsize=12)
+    plt.xticks(rotation=90)
+    plt.legend(title='Party', labels=['Democratic', 'Republican'])
+    
+    # Show the plot
+    plt.tight_layout()
+    plt.show()
 
 
 def main():
@@ -395,6 +444,10 @@ def main():
     print_bold("Congressional district with most ballot requests")
     print(get_most_ballot_count_in_group(application_in, 'congressional'))
     
+    # Visualizing Democrat and Republican application counts by county
+    print_bold("Drawing plot for visualizing Democrat and Republican application counts by county")
+    visualize_party_applications(application_in)
+    
 
 if __name__ == '__main__':
     # Run the main function
@@ -417,7 +470,7 @@ if __name__ == '__main__':
 
 # [x]• What is the congressional district (congressional) that has the highest frequency of ballot requests?
 
-# []• Create a visualization demonstrating the republican and democratic application counts in each county.
+# [x]• Create a visualization demonstrating the republican and democratic application counts in each county.
 
 
 
