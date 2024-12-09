@@ -45,11 +45,14 @@ def fetch_data_and_load_to_dataframe(endpoint_url, column_dtypes=None):
     Sends a GET request to the API, retrieves raw data, and loads it into a DataFrame.
     Automatically converts columns with the 'Floating Timestamp' type (per the dataset documentation) to datetime.
     Some birth dates will show up as 1/1/1800 for confidentiality reasons. A flag is added to handle these
-    differently during later analysis operations. 
+    differently during later analysis operations.
 
-    :param api_url: The URL of the API endpoint.
-    :param column_dtypes: (optional) A dictionary specifying the desired data types for specific columns.
-    :return: A Pandas DataFrame with the data, or None if the request fails.
+    Parameters:
+        endpoint_url (str): The URL of the API endpoint.
+        column_dtypes (dict, optional): A dictionary specifying the desired data types for specific columns.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the data, or None if the request fails.
 
     Note:
         Dataset documentation: https://data.pa.gov/Government-Efficiency-Citizen-Engagement/2020-General-Election-Mail-Ballot-Requests-Departm/mcba-yywm/about_data.
@@ -97,13 +100,17 @@ def remove_and_separate_invalid_data(df):
     """
     This function removes rows with any null values from a DataFrame
     and stores them in a separate DataFrame called 'invalid_data'.
-    
-    :param df: The DataFrame to check and clean.
-    :return: invalid_data_df, which contains rows with null values.
+
+    Parameters:
+        df (pandas.DataFrame): The DataFrame to check and clean.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing rows with null values.
     """
+    
     # Identify rows with null values in any column
     invalid_data = df[df.isnull().any(axis=1)]
-    
+
     # Remove rows with null values from the original DataFrame
     df.dropna(inplace=True)
 
@@ -112,10 +119,12 @@ def remove_and_separate_invalid_data(df):
 # Function to print the first 5 rows of DataFrame with a header 
 def print_df_head(df):
     """
-    Displays few rows of the DataFrame.
-    
-    :param df: The DataFrame to display.
+    Displays the first five rows of the DataFrame.
+
+    Parameters:
+        df (pandas.DataFrame): The DataFrame to display.
     """
+    
     if df is not None:
         print("First 5 rows:")
         print(df.head())
@@ -125,9 +134,11 @@ def print_df_head(df):
 def display_dataframe_info(df):
     """
     Displays basic information and the first few rows of the DataFrame.
-    
-    :param df: The DataFrame to display info for.
+
+    Parameters:
+        df (pandas.DataFrame): The DataFrame to display info for.
     """
+    
     if df is not None:
         print("DataFrame Info:")
         print(df.info(), "\n")
@@ -138,8 +149,10 @@ def print_bold(text):
     """
     Prints the given text in bold in the console.
 
-    param text: The string to be printed in bold.
+    Parameters:
+        text (str): The string to be printed in bold.
     """
+    
     # ANSI escape code for bold text
     BOLD_CODE = '\033[1m'
     ORANGE_CODE = '\033[38;5;214m'
@@ -154,9 +167,13 @@ def convert_str_to_snake_case(text):
     """
     Converts a string to snake_case.
 
-    :param text: The string to be converted.
-    :return: The string in snake_case.
+    Parameters:
+        text (str): The string to be converted.
+
+    Returns:
+        str: The string in snake_case.
     """
+    
     return text.replace(' ', '_').lower()
 
 
@@ -167,26 +184,35 @@ def convert_column_to_snake_case(df, column_name):
     Modifies DataFrame in place.
     Raises a ValueError if the specified column does not exist in the DataFrame. (Case sensitive)
 
-    :param df: DataFrame with the specified column.
-    :type df: pandas.DataFrame
-    :param column_name: Name of the column to convert (case sensitive).
-    :type column_name: str
+    Parameters:
+        df (pandas.DataFrame): DataFrame containing the column to be converted.
+        column_name (str): The name of the column to convert (case sensitive).
+
+    Raises:
+        ValueError: If the specified column does not exist in the DataFrame.
     """
+    
     # Validate column_name
     if column_name not in df.columns:
         raise ValueError(f"Column '{column_name}' not found in DataFrame.")
-    
+
     # Convert entries using helper function convert_str_to_snake_case()
     df[column_name] = df[column_name].apply(convert_str_to_snake_case)
-    
+
+# Adds a 'yr_born' column with the year extracted from 'dateofbirth'.
 def add_column_year_of_birth(df):
     """
     Adds a 'yr_born' column with the year extracted from 'dateofbirth'.
     DataFrame cannot be modified in place by reference. Must be updated
-    in main with reasignment. `application_in = add_column_year_of_birth(application_in)`
+    in main with reassignment. Example: `application_in = add_column_year_of_birth(application_in)`.
 
-    :param df: DataFrame with an existing 'dateofbirth' column.
+    Parameters:
+        df (pandas.DataFrame): DataFrame containing the 'dateofbirth' column.
+
+    Returns:
+        pandas.DataFrame: The DataFrame with the 'yr_born' column added.
     """
+    
     if 'dateofbirth' in df.columns:
         # Extract the year from the 'dateofbirth' column
         df['yr_born'] = pd.to_datetime(df['dateofbirth']).dt.year
@@ -200,8 +226,9 @@ def add_column_year_of_birth(df):
         # Ensure 'yr_born' is of type integer
         df['yr_born'] = df['yr_born'].astype(int)
         return df
-    
-    
+
+
+# Calculates the correlation between age and party affiliation.
 def corr_age_and_party(df, exclude_confidential=True, use_drother_mapping=True):
     """
     Calculates the correlation between age and party affiliation.
@@ -211,12 +238,16 @@ def corr_age_and_party(df, exclude_confidential=True, use_drother_mapping=True):
     By default, excludes entries flagged as confidential.
     This can be controlled with the `exclude_confidential` parameter.
 
-    :param df: DataFrame with columns 'dateofbirth', 'party', and 'is_confidential'.
-    :param exclude_confidential: Whether to exclude confidential entries. Default is True.
-    :param use_drother_mapping: If True, map parties to 'R', 'D', and 'Other'. If False, map each unique party to an integer.
-    :return: Correlation matrix for age and party affiliation.
-    :rtype: pandas.DataFrame
-    :raises KeyError: If any required columns are missing.
+    Parameters:
+        df (pandas.DataFrame): DataFrame containing 'dateofbirth', 'party', and 'is_confidential' columns.
+        exclude_confidential (bool, optional): Whether to exclude confidential entries. Default is True.
+        use_drother_mapping (bool, optional): If True, map parties to 'R', 'D', and 'Other'. If False, map each unique party to an integer. Default is True.
+
+    Returns:
+        pandas.DataFrame: Correlation matrix for age and party affiliation.
+
+    Raises:
+        KeyError: If any required columns are missing.
     """
     
     # Ensure required columns exist
@@ -255,25 +286,26 @@ def corr_age_and_party(df, exclude_confidential=True, use_drother_mapping=True):
     
     return correlation_matrix
 
+
+# Returns single row DataFrame with the most ballots in a groupby
 def get_most_ballot_count_in_group(df, column_name):
     """
     Groups the DataFrame by a specified column and returns the group with the highest ballot count.
 
-    :param df: pandas DataFrame
-        The DataFrame to group and count.
-    
-    :param column_name: str
-        The column to group by.
+    Parameters:
+        df (pandas.DataFrame): The DataFrame to group and count.
+        column_name (str): The column to group by.
 
-    :raises KeyError: If the column_name is not in the DataFrame.
+    Returns:
+        pandas.DataFrame: A DataFrame with one row: the group with the highest count and its count.
 
-    :return: pandas DataFrame
-        A DataFrame with one row: the group with the highest count and its count.
+    Raises:
+        KeyError: If the specified column is not in the DataFrame.
     """
     
     if column_name not in df:
         raise KeyError(f"The DataFrame must contain {column_name} column.")
-    
+
     # Groupby and store counts
     count_df = df.groupby([column_name])[column_name].count().reset_index(name='count')
 
@@ -347,7 +379,7 @@ if __name__ == '__main__':
 
 # []• What was the median latency from when each legislative district (legislative) issued their application and when the ballot was returned?
 
-# []• What is the congressional district (congressional) that has the highest frequency of ballot requests?
+# [x]• What is the congressional district (congressional) that has the highest frequency of ballot requests?
 
 # []• Create a visualization demonstrating the republican and democratic application counts in each county.
 
